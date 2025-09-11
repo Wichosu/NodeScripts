@@ -56,14 +56,27 @@ const book: Book = createBook(
   bookName,
   filterLessonNumbers.map((lesson) =>
     createLesson(
-      `${bookName} - ${lesson}`,
-      data.map((uploadThingItem) =>
-        createAudioTrack(
-          `Lesson - ${uploadThingItem.name.split('-')[2]}`,
-          uploadThingItem.name,
-          uploadThingItem.url
-        )
-      )
+      `${bookName} - Lesson ${lesson}`,
+      data
+        .map((uploadThingItem) => {
+          //hsk5B-textbook-1901.mp3
+          const audiotrack = uploadThingItem.name.split('-')[2].split('.')[0];
+
+          return createAudioTrack(
+            `Lesson - ${audiotrack}`,
+            uploadThingItem.name,
+            uploadThingItem.url
+          );
+        })
+        .filter((audiotrack) => {
+          const audiotrackNumber = audiotrack.title
+            .split('-')[1]
+            .trim()
+            .substring(0, 2);
+          console.log('track number', audiotrackNumber.trim().substring(0, 2));
+
+          return audiotrackNumber.includes(lesson);
+        })
     )
   )
 );

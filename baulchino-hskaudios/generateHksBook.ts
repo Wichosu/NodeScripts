@@ -77,6 +77,12 @@ const book: Book = createBook(
 
           return audiotrackNumber.includes(lesson);
         })
+        .sort((a, b) => {
+          const audiotrackA = parseInt(a.title.split('-')[1].trim());
+          const audiotrackB = parseInt(b.title.split('-')[1].trim());
+
+          return audiotrackA - audiotrackB;
+        })
     )
   )
 );

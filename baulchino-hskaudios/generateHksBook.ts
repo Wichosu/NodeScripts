@@ -26,17 +26,10 @@ if (!process.argv[3]) {
   throw new Error('Missing name of book as third argument');
 }
 
-console.log('this is a script');
-
-console.log(process.argv[2]);
-
 const jsonFile = process.argv[2];
 const bookName = process.argv[3];
 
 const data: uploadThingJson[] = require(`./${jsonFile}`);
-
-console.log('Parsed data');
-console.log(data[0].name);
 
 //Attempt to extract lessons
 const dataNames = data.map((item) => item.name);
@@ -49,42 +42,40 @@ const lessonDuplicatedNumbers = splitedNames.map((lessonNames) =>
 
 const filterLessonNumbers = [...new Set(lessonDuplicatedNumbers)];
 
-console.log('Trying to get the lesson names');
-console.log(dataNames);
-
 const book: Book = createBook(
   bookName,
-  filterLessonNumbers.map((lesson) =>
-    createLesson(
-      `${bookName} - Lesson ${lesson}`,
-      data
-        .map((uploadThingItem) => {
-          //hsk5B-textbook-1901.mp3
-          const audiotrack = uploadThingItem.name.split('-')[2].split('.')[0];
+  filterLessonNumbers
+    .map((lesson) =>
+      createLesson(
+        `${bookName} - Lesson ${lesson}`,
+        data
+          .map((uploadThingItem) => {
+            //hsk5B-textbook-1901.mp3
+            const audiotrack = uploadThingItem.name.split('-')[2].split('.')[0];
 
-          return createAudioTrack(
-            `Lesson - ${audiotrack}`,
-            uploadThingItem.name,
-            uploadThingItem.url
-          );
-        })
-        .filter((audiotrack) => {
-          const audiotrackNumber = audiotrack.title
-            .split('-')[1]
-            .trim()
-            .substring(0, 2);
-          console.log('track number', audiotrackNumber.trim().substring(0, 2));
+            return createAudioTrack(
+              `Lesson - ${audiotrack}`,
+              uploadThingItem.name,
+              uploadThingItem.url
+            );
+          })
+          .filter((audiotrack) => {
+            const audiotrackNumber = audiotrack.title
+              .split('-')[1]
+              .trim()
+              .substring(0, 2);
 
-          return audiotrackNumber.includes(lesson);
-        })
-        .sort((a, b) => {
-          const audiotrackA = parseInt(a.title.split('-')[1].trim());
-          const audiotrackB = parseInt(b.title.split('-')[1].trim());
+            return audiotrackNumber.includes(lesson);
+          })
+          .sort((a, b) => {
+            const audiotrackA = parseInt(a.title.split('-')[1].trim());
+            const audiotrackB = parseInt(b.title.split('-')[1].trim());
 
-          return audiotrackA - audiotrackB;
-        })
+            return audiotrackA - audiotrackB;
+          })
+      )
     )
-  )
+    .reverse()
 );
 
 const jsonString = JSON.stringify(book, null, 2);
